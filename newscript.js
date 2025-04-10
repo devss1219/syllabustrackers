@@ -271,3 +271,62 @@ function renderSyllabus() {
 
 // Call renderSyllabus to initialize UI
 renderSyllabus();
+
+// SEARCH FUNCTIONALITY
+function searchTopic() {
+    const query = document.getElementById("searchInput").value.toLowerCase().trim();
+    if (!query) return;
+
+    let found = false;
+
+    Object.keys(syllabus).forEach(subject => {
+        Object.keys(syllabus[subject]).forEach(module => {
+            syllabus[subject][module].forEach(topic => {
+                if (topic.toLowerCase().includes(query)) {
+                    const subjectDiv = document.getElementById(`subject-${encodeURIComponent(subject)}`);
+                    const moduleDiv = document.getElementById(`module-${encodeURIComponent(subject)}-${encodeURIComponent(module)}`);
+
+                    // Ensure subject/module are visible
+                    if (subjectDiv.style.display === "none") {
+                        subjectDiv.style.display = "block";
+                    }
+
+                    if (moduleDiv.style.display === "none") {
+                        moduleDiv.style.display = "block";
+                        moduleDiv.classList.add("open");
+                    }
+
+                    // Scroll to and highlight topic
+                    const topicElem = document.querySelector(`[data-topic='${subject}-${module}-${topic}']`);
+                    if (topicElem) {
+                        setTimeout(() => {
+                            topicElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                            // Clear previous highlights
+                            document.querySelectorAll('.highlight').forEach(el => el.classList.remove('highlight'));
+
+                            topicElem.parentElement.classList.add('highlight');
+                        }, 100);
+                        found = true;
+                    }
+                }
+            });
+        });
+    });
+
+    if (!found) {
+        alert("Topic not found. Please check the spelling.");
+    }
+}
+
+// ENTER key activates search
+document.addEventListener("DOMContentLoaded", function () {
+    const input = document.getElementById("searchInput");
+    if (input) {
+        input.addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+                searchTopic();
+            }
+        });
+    }
+});
